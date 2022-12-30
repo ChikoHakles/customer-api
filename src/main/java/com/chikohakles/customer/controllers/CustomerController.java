@@ -13,6 +13,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -69,6 +70,27 @@ public class CustomerController {
         //klo gada, status not found
         else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    //url nya sama kayak yg pertama, tapi yg ini tereksekusi klo method nya post, ini bakal tambah customer
+    @PostMapping("/customers")
+    //@requestbody buat ngecek apa semua parameter si customer ini ada di request nya (input si customer baru nya)
+    public ResponseEntity<Customer> create(@RequestBody Customer customer) {
+        try {
+            //dari customer yg dikirim lewat request ini, bikin objek newCustomer yg atribut nya mengikuti apa yg dikirim lewat request tadi (kecuali id, 0 biar auto increment db yg isi)
+            Customer newCustomer = new Customer();
+            newCustomer.setId(0);//otomatis keisi sama auto increment di db
+            newCustomer.setNama(customer.getNama());
+            newCustomer.setAlamat(customer.getAlamat());
+            newCustomer.setEmail(customer.getEmail());
+            newCustomer.setTelepon(customer.getTelepon());
+            //save di customer repository, nanti bakal masuk db
+            return new ResponseEntity<>(customerRepository.save(newCustomer), HttpStatus.CREATED);
+        }
+        catch (Exception e) {
+            //klo error, status internal server error
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

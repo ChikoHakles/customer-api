@@ -1,6 +1,9 @@
 package com.chikohakles.customer.entities;
 
 import java.io.Serializable;
+
+import org.springframework.data.relational.core.mapping.Table;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
@@ -12,6 +15,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
+@Table
 public class Customer implements Serializable{
     @Id
     private Integer id;
