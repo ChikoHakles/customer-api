@@ -10,9 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -90,7 +92,35 @@ public class CustomerController {
         }
         catch (Exception e) {
             //klo error, status internal server error
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/customers/{id}")
+    public ResponseEntity<Customer> update(@PathVariable("id") Integer id, @RequestBody Customer customer) {
+        Optional<Customer> customerData = customerRepository.findById(id.toString());
+
+        if(customerData.isPresent()) {
+            Customer updatedCustomer = customerData.get();
+            updatedCustomer.setNama(customer.getNama());
+            updatedCustomer.setAlamat(customer.getAlamat());
+            updatedCustomer.setEmail(customer.getEmail());
+            updatedCustomer.setTelepon(customer.getTelepon());
+
+            return new ResponseEntity<>(customerRepository.save(updatedCustomer), HttpStatus.OK);
+        }
+        else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @DeleteMapping("/customers/{id}")
+    public ResponseEntity<HttpStatus> delete(@PathVariable("id") Integer id) {
+        try {
+            customerRepository.deleteById(id.toString());
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
